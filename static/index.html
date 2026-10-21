@@ -1,0 +1,119 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NU10 Interview Scheduler</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <img src="/static/nu10logo.jpg" alt="NU10 logo">
+  <div>
+    <strong>Interview Scheduler</strong>
+    <span>Talent Acquisition Workspace</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">NU10 · TALENT ACQUISITION</p>
+      <h1>Schedule interviews, simply.</h1>
+      <p>Send branded invitations, let candidates choose a time, and track every interview in one place.</p>
+    </div>
+    <div class="hero-mark">NU10<br><small>Interview Scheduler</small></div>
+  </section>
+
+  <div id="notice" class="notice hidden" role="status"></div>
+
+  <section class="panel">
+    <div class="section-head">
+      <div>
+        <h2>Create an interview invitation</h2>
+        <p>Enter details and add at least one future slot.</p>
+      </div>
+      <button id="mockBtn" class="outline" type="button">Populate mock data</button>
+    </div>
+
+    <form id="interviewForm">
+      <div class="form-grid">
+        <label>Candidate name *
+          <input id="candidate_name" required maxlength="200" placeholder="e.g. Priya Sharma">
+        </label>
+        <label>Candidate email *
+          <input id="candidate_email" required type="email" placeholder="candidate@example.com">
+        </label>
+        <label>Candidate phone
+          <input id="candidate_phone" placeholder="+91 ...">
+        </label>
+        <label>Job title *
+          <input id="job_title" required placeholder="e.g. AI Engineer">
+        </label>
+        <label>Interviewer name *
+          <input id="interviewer_name" required placeholder="e.g. Rahul Mehta">
+        </label>
+        <label>Interviewer email *
+          <input id="interviewer_email" required type="email" placeholder="interviewer@company.com">
+        </label>
+      </div>
+
+      <div class="section-head slots-head">
+        <div>
+          <h3>Available interview slots</h3>
+          <p>Local device time is used. Add between 1 and 10 slots.</p>
+        </div>
+        <button type="button" id="addSlot" class="outline">+ Add slot</button>
+      </div>
+
+      <div id="slots" class="slots"></div>
+
+      <div class="form-actions">
+        <span class="muted">Fields marked * are required.</span>
+        <button type="submit" id="submitBtn">Save &amp; send invitation</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel admin-panel">
+    <div class="section-head">
+      <div>
+        <h2>Interview status</h2>
+        <p>Current interview statuses refresh automatically.</p>
+      </div>
+      <button id="refreshBtn" class="outline" type="button">Refresh</button>
+    </div>
+
+    <div class="stats">
+      <div><span>Total interviews</span><b id="totalCount">0</b></div>
+      <div><span>Awaiting selection</span><b id="waitingCount">0</b></div>
+      <div><span>Scheduled</span><b id="scheduledCount">0</b></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Role</th>
+            <th>Interview status</th>
+            <th>Created</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="interviewRows">
+          <tr><td colspan="5">Loading interview statuses…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="detail" class="detail hidden"></div>
+  </section>
+
+  <footer>NU10 Interview Scheduler</footer>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
