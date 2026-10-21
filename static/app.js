@@ -462,3 +462,48 @@ startDashboard();
 setInterval(() => {
   loadInterviews().catch(() => {});
 }, 10000);
+
+document.getElementById("extractResume")?.addEventListener("click", async () => {
+  const fileInput = document.getElementById("resumeFile");
+  const message = document.getElementById("resumeMessage");
+  const button = document.getElementById("extractResume");
+  const file = fileInput?.files?.[0];
+
+  if (!file) {
+    message.textContent = "Please choose a resume file first.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Extracting resume details...";
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/resume/extract", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail || "Extraction failed.");
+
+    const fields = {
+      candidate_name: result.candidate_name,
+      candidate_email: result.candidate_email,
+      candidate_phone: result.candidate_phone
+    };
+
+    for (const [id, value] of Object.entries(fields)) {
+      const input = document.getElementById(id);
+      if (input && value) input.value = value;
+    }
+
+    message.textContent = "Extraction complete. Please review the details.";
+  } catch (error) {
+    message.textContent = "Error: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});

@@ -1,8 +1,10 @@
 
 import os, json, secrets, requests
 import requests
+import re
+from io import BytesIO
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr, Field
@@ -233,6 +235,86 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "ok", "service": APP_NAME}
+
+@app.post("/resume/extract")
+async def extract_resume(file: UploadFile = File(...)):
+    filename = (file.filename or "").lower()
+
+    if not filename.endswith((".pdf", ".docx", ".txt")):
+        raise HTTPException(
+            status_code=400,
+            detail="Upload a PDF, DOCX, or TXT resume."
+        )
+
+    content = await file.read()
+
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=413,
+            detail="Resume must be smaller than 5 MB."
+        )
+
+    try:
+        if filename.endswith(".pdf"):
+            from pypdf import PdfReader
+            reader = PdfReader(BytesIO(content))
+            text = "\n".join(
+                page.extract_text() or "" for page in reader.pages
+            )
+
+        elif filename.endswith(".docx"):
+            from docx import Document
+            document = Document(BytesIO(content))
+            text = "\n".join(
+                paragraph.text for paragraph in document.paragraphs
+            )
+
+        else:
+            text = content.decode("utf-8", errors="replace")
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not read this resume. Try another file."
+        ) from exc
+
+    email_match = re.search(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+        text
+    )
+
+    phone_match = re.search(
+        r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)",
+        text
+    )
+
+    lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+    ]
+
+    # Best-effort name detection from the first few lines.
+    candidate_name = ""
+    for line in lines[:10]:
+        cleaned = re.sub(r"\s+", " ", line).strip()
+        if (
+            len(cleaned) <= 70
+            and re.fullmatch(r"[A-Za-z][A-Za-z .'-]*", cleaned)
+            and len(cleaned.split()) >= 2
+            and cleaned.lower() not in {
+                "curriculum vitae", "resume", "professional summary"
+            }
+        ):
+            candidate_name = cleaned
+            break
+
+    return {
+        "candidate_name": candidate_name,
+        "candidate_email": email_match.group(0) if email_match else "",
+        "candidate_phone": phone_match.group(0).strip() if phone_match else "",
+        "message": "Resume processed. Review the extracted details."
+    }
 
 
 @app.post("/interviews/start")

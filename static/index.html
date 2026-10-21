@@ -38,6 +38,23 @@
     </div>
 
     <form id="interviewForm">
+      <div class="resume-upload">
+  <h3>Upload Candidate Resume</h3>
+  <p>Upload a PDF, DOCX, or TXT resume to autofill candidate details.</p>
+
+  <label for="resumeFile">Choose resume</label>
+  <input
+    type="file"
+    id="resumeFile"
+    accept=".pdf,.docx,.txt"
+  >
+
+  <button type="button" id="extractResume" class="outline">
+    Extract Candidate Details
+  </button>
+
+  <p id="resumeMessage" role="status"></p>
+</div>
       <div class="form-grid">
         <label>Candidate name *
           <input id="candidate_name" required maxlength="200" placeholder="e.g. Priya Sharma">
