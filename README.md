@@ -57,8 +57,6 @@ Use a host that supports a long-running Python web service and persistent Postgr
 uvicorn app:app --host 0.0.0.0 --port $PORT
 ```
 Set these environment variables in the host dashboard:
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
 - `PUBLIC_BASE_URL=https://YOUR-PUBLIC-DOMAIN`
