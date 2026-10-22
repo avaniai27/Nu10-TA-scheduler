@@ -935,9 +935,11 @@ def create_calendar_event(iv):
             }
         },
     }
-    created = service.events().insert(
-        calendarId="primary", body=event, sendUpdates="all", conferenceDataVersion=1
-    ).execute()
+    service.events().insert(
+    calendarId="primary",
+    body=event,
+    sendUpdates="none"
+).execute()
 
     # Meet generation can be asynchronous; poll briefly for the conference link.
     event_id = created.get("id")
