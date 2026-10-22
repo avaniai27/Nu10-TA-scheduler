@@ -553,6 +553,7 @@ def confirmation_html(iv, recipient_name, is_candidate):
     {f'<p><a href="{iv.meeting_url}" style="display:inline-block;background:#168de2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Join Google Meet</a></p>' if iv.meeting_url and 'meet.google.com' in iv.meeting_url else '<p>Your Google Meet link is being prepared. If it is not included in the calendar invitation, please contact NU10 Talent Acquisition using the details below.</p>'}
 
     <p>Please keep this email for your records.</p>
+    """
 
     return email_shell(content)
 
