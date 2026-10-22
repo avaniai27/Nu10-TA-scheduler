@@ -1290,4 +1290,8 @@ async def reminder_scan():
 
         db.close()
 
+from fastapi.responses import FileResponse
 
+@app.get("/")
+def home():
+    return FileResponse(STATIC_DIR / "index.html")

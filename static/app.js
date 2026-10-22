@@ -144,6 +144,9 @@ async function loadInterviews() {
   }
 
   interviews = data;
+  if (window.updateReadinessDashboard) {
+  window.updateReadinessDashboard(data);
+}
 
   if ($("totalCount")) {
     $("totalCount").textContent = data.length;
@@ -507,3 +510,72 @@ document.getElementById("extractResume")?.addEventListener("click", async () => 
     button.disabled = false;
   }
 });
+
+// NU10 AI Interview Readiness Dashboard
+(function addReadinessDashboard() {
+  if (document.getElementById("readinessDashboard")) return;
+
+  const panel = document.querySelector(".admin-panel");
+  if (!panel) return;
+
+  const dashboard = document.createElement("section");
+  dashboard.id = "readinessDashboard";
+  dashboard.className = "panel";
+  dashboard.innerHTML = `
+    <h2>AI Interview Readiness Dashboard</h2>
+    <p class="muted">Live overview of interview scheduling readiness.</p>
+
+    <div class="stats">
+      <div><span>Total interviews</span><b id="rdTotal">0</b></div>
+      <div><span>Scheduled</span><b id="rdScheduled">0</b></div>
+      <div><span>Awaiting selection</span><b id="rdWaiting">0</b></div>
+      <div><span>Needs attention</span><b id="rdAttention">0</b></div>
+    </div>
+
+    <h3>Readiness checklist</h3>
+    <ul id="rdChecklist">
+      <li>⏳ Waiting for interview data…</li>
+    </ul>
+  `;
+
+  panel.parentNode.insertBefore(dashboard, panel);
+
+  window.updateReadinessDashboard = function (items) {
+    const data = Array.isArray(items) ? items : [];
+    const scheduled = data.filter(iv => Boolean(iv.selected_slot));
+    const waiting = data.filter(iv =>
+      !iv.selected_slot &&
+      !String(iv.status || "").toLowerCase().includes("failed")
+    );
+    const attention = data.filter(iv =>
+      String(iv.status || "").toLowerCase().includes("failed") ||
+      Boolean(iv.last_error) ||
+      iv.invitation_sent === false
+    );
+
+    document.getElementById("rdTotal").textContent = data.length;
+    document.getElementById("rdScheduled").textContent = scheduled.length;
+    document.getElementById("rdWaiting").textContent = waiting.length;
+    document.getElementById("rdAttention").textContent = attention.length;
+
+    const checklist = document.getElementById("rdChecklist");
+    checklist.innerHTML = "";
+
+    const checks = [
+      [data.length > 0, "Interview records are available"],
+      [data.length > 0 && data.every(iv => iv.invitation_sent), "Invitations sent"],
+      [scheduled.length > 0, "At least one interview scheduled"],
+      [attention.length === 0, "No detected email or scheduling errors"]
+    ];
+
+    checks.forEach(([ok, label]) => {
+      const li = document.createElement("li");
+      li.textContent = `${ok ? "✅" : "⏳"} ${label}`;
+      checklist.appendChild(li);
+    });
+  };
+
+  window.updateReadinessDashboard(
+    typeof interviews !== "undefined" ? interviews : []
+  );
+})();
