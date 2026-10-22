@@ -943,10 +943,9 @@ def create_calendar_event(iv):
 
     # Meet generation can be asynchronous; poll briefly for the conference link.
     if not created:
-    raise RuntimeError(
+       raise RuntimeError(
         "Google Calendar event was not created. Check the calendar event creation step."
-    )
-
+)
 event_id = created.get("id")
 meet_url = created.get("hangoutLink")
 
@@ -985,7 +984,10 @@ try:
 finally:
     db.close()
 
-    print(f"GOOGLE CALENDAR EVENT CREATED for interview {iv.id}: {event_id}; Meet: {meet_url}")
+    print(
+        f"GOOGLE CALENDAR EVENT CREATED for interview {iv.id}: "
+        f"{event_id}; Meet: {meet_url}"
+    )
     return created
 
 
