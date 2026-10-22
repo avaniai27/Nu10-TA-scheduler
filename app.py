@@ -428,6 +428,10 @@ def send_email(to, subject, html):
 
 
 
+
+logo_url = "/static/nu10logo.png"
+interviewer_email = getattr(iv, "interviewer_email", "")
+
 signature = f"""
 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;">
   <p>Best regards,</p>
@@ -436,21 +440,20 @@ signature = f"""
     <tr>
       <td style="padding:8px 20px 8px 0;vertical-align:middle;
                  border-right:2px solid #c8b9d8;">
-        <img src="{logo_url}" alt="NU10"
-             style="width:180px;max-width:180px;height:auto;display:block;">
+        <div style="font-size:24px;font-weight:bold;color:#168de2;">NU10</div>
       </td>
       <td style="padding:8px 0 8px 20px;vertical-align:middle;line-height:1.8;">
-        <div style="font-size:20px;font-weight:bold;color:#168de2;">NU10</div>
+        <div style="font-size:20px;font-weight:bold;color:#168de2;">NU10 Technologies</div>
         <div style="font-weight:bold;">Talent Acquisition</div>
         <div>
-          <a href="mailto:{iv.interviewer_email}" style="color:#168de2;">
-            {iv.interviewer_email}
+          <a href="mailto:{interviewer_email}" style="color:#168de2;">
+            {interviewer_email}
           </a>
         </div>
         <div>#484, Premier Square, 3rd Floor,<br>
         Chinmaya Mission Hospital Road,<br>
         Indiranagar, Bengaluru, KA - 560038, India</div>
-        <div style="margin-top:12px;">USA ★ Estonia ★ India</div>
+        <div style="margin-top:12px;">USA | Estonia | India</div>
       </td>
     </tr>
   </table>
