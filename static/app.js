@@ -135,6 +135,28 @@ function statusTone(iv) {
   return "";
 }
 
+function formatCreatedAt(value) {
+  if (!value) return "—";
+
+  // Treat timestamps without a timezone as UTC.
+  const timestamp = /(?:Z|[+-]\d{2}:\d{2})$/i.test(value)
+    ? value
+    : value + "Z";
+
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  }) + " IST";
+}
 async function loadInterviews() {
   const tbody = $("interviewRows");
   const data = await api("/api/interviews");
@@ -180,7 +202,7 @@ async function loadInterviews() {
         </td>
         <td>${escapeHtml(iv.job_title)}</td>
         <td><span class="status ${statusTone(iv)}">${escapeHtml(displayStatus(iv))}</span></td>
-        <td>${iv.created_at ? new Date(iv.created_at).toLocaleString() : "—"}</td>
+        <td>${formatCreatedAt(iv.created_at)}</td>
         <td><button type="button" class="outline" data-detail="${Number(iv.id)}">${isOpen ? "Hide" : "View"}</button></td>`;
 
       tbody.appendChild(tr);
