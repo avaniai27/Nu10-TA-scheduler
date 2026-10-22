@@ -885,8 +885,9 @@ def start_interview(data: dict, db=Depends(get_db)):
 
 
 
+
 def create_calendar_event(iv):
-    """Create a Calendar event with a unique Google Meet link and invite both guests."""
+    """Create a Google Calendar event and save its Google Meet link."""
     from datetime import timedelta
     from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
@@ -896,30 +897,51 @@ def create_calendar_event(iv):
         "https://www.googleapis.com/auth/gmail.send",
         "https://www.googleapis.com/auth/calendar.events",
     ]
+
     token_json = os.getenv("GMAIL_TOKEN_JSON", "").strip()
     token_path = os.path.join(os.path.dirname(__file__), "token.json")
 
     if token_json:
-        creds = Credentials.from_authorized_user_info(json.loads(token_json), scopes=scopes)
+        creds = Credentials.from_authorized_user_info(
+            json.loads(token_json), scopes=scopes
+        )
     elif os.path.exists(token_path):
-        creds = Credentials.from_authorized_user_file(token_path, scopes=scopes)
+        creds = Credentials.from_authorized_user_file(
+            token_path, scopes=scopes
+        )
     else:
-        raise RuntimeError("Google token missing. Set GMAIL_TOKEN_JSON or authorize locally.")
+        raise RuntimeError(
+            "Google token missing. Configure GMAIL_TOKEN_JSON."
+        )
 
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
-    if not creds.valid:
-        raise RuntimeError("Google authorization is invalid or expired. Reauthorize Gmail and Calendar.")
 
-    start = datetime.fromisoformat(iv.selected_slot.replace("Z", "+00:00"))
+    if not creds.valid:
+        raise RuntimeError(
+            "Google authorization is invalid or expired."
+        )
+
+    start = datetime.fromisoformat(
+        iv.selected_slot.replace("Z", "+00:00")
+    )
     end = start + timedelta(minutes=60)
-    service = build("calendar", "v3", credentials=creds, cache_discovery=False)
+
+    service = build(
+        "calendar", "v3",
+        credentials=creds,
+        cache_discovery=False
+    )
+
     event = {
-        "summary": f"NU10 Interview - {iv.candidate_name} - {iv.job_title}",
+        "summary": (
+            f"NU10 Interview - {iv.candidate_name} - {iv.job_title}"
+        ),
         "description": (
-            f"Interview for {iv.job_title}\nCandidate: {iv.candidate_name}\n"
+            f"Interview for {iv.job_title}\n"
+            f"Candidate: {iv.candidate_name}\n"
             f"Interviewer: {iv.interviewer_name}\n"
-            "Join using the Google Meet link attached to this calendar event."
+            "Join using the Google Meet link in the NU10 confirmation email."
         ),
         "start": {"dateTime": start.isoformat()},
         "end": {"dateTime": end.isoformat()},
@@ -935,59 +957,60 @@ def create_calendar_event(iv):
             }
         },
     }
-    service.events().insert(
-    calendarId="primary",
-    body=event,
-    sendUpdates="none"
-).execute()
 
-    # Meet generation can be asynchronous; poll briefly for the conference link.
-    if not created:
-       raise RuntimeError(
-        "Google Calendar event was not created. Check the calendar event creation step."
-)
-event_id = created.get("id")
-meet_url = created.get("hangoutLink")
-
-if not event_id:
-    raise RuntimeError(
-        "Google Calendar did not return an event ID."
-    )
-
-for _ in range(5):
-    if meet_url:
-        break
-
-    time.sleep(1)
-    current = service.events().get(
+    # IMPORTANT: Save the result of execute() into created.
+    created = service.events().insert(
         calendarId="primary",
-        eventId=event_id
+        body=event,
+        conferenceDataVersion=1,
+        sendUpdates="none",
     ).execute()
 
-    meet_url = current.get("hangoutLink")
-    created = current
+    event_id = created.get("id")
+    meet_url = created.get("hangoutLink")
 
-if not meet_url:
-    raise RuntimeError(
-        "Google Calendar created the event but did not return a Google Meet link yet. "
-        "Check that Google Calendar is enabled and the authorized account can create Meet conferences."
-    )
+    if not event_id:
+        raise RuntimeError(
+            "Google Calendar did not return an event ID."
+        )
 
-iv.meeting_url = meet_url
+    # Google Meet creation may take a few seconds.
+    for _ in range(5):
+        if meet_url:
+            break
 
-db = SessionLocal()
-try:
-    saved = db.query(Interview).filter_by(id=iv.id).first()
-    if saved:
-        saved.meeting_url = meet_url
-        db.commit()
-finally:
-    db.close()
+        time.sleep(1)
+
+        current = service.events().get(
+            calendarId="primary",
+            eventId=event_id,
+        ).execute()
+
+        meet_url = current.get("hangoutLink")
+        created = current
+
+    if not meet_url:
+        raise RuntimeError(
+            "Calendar event was created, but Google Meet did not return "
+            "a link. Check Google Calendar and Meet authorization."
+        )
+
+    iv.meeting_url = meet_url
+
+    db = SessionLocal()
+    try:
+        saved = db.query(Interview).filter_by(id=iv.id).first()
+        if saved:
+            saved.meeting_url = meet_url
+            db.commit()
+    finally:
+        db.close()
 
     print(
         f"GOOGLE CALENDAR EVENT CREATED for interview {iv.id}: "
         f"{event_id}; Meet: {meet_url}"
     )
+
     return created
 
 
