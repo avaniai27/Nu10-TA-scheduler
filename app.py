@@ -106,9 +106,9 @@ def fmt_slot(value):
 
 
 
+
 def send_email(to, subject, html):
-    """Send HTML email using the authorized Gmail API."""
-    import os
+    """Send HTML email using the Gmail API."""
     import base64
     from email.mime.text import MIMEText
     from email.utils import formataddr
@@ -116,31 +116,44 @@ def send_email(to, subject, html):
     from google.auth.transport.requests import Request
     from googleapiclient.discovery import build
 
+    scopes = ["https://www.googleapis.com/auth/gmail.send"]
+    token_json = os.getenv("GMAIL_TOKEN_JSON", "").strip()
     token_path = os.path.join(os.path.dirname(__file__), "token.json")
 
-    if not os.path.exists(token_path):
-        raise RuntimeError("Gmail token.json is missing.")
-
-    token_json = os.getenv("GMAIL_TOKEN_JSON", "").strip()
-
-if token_json:
-    creds = Credentials.from_authorized_user_info(
-        json.loads(token_json),
-        ["https://www.googleapis.com/auth/gmail.send"]
-    )
-else:
-    creds = Credentials.from_authorized_user_file(
-        token_path,
-        ["https://www.googleapis.com/auth/gmail.send"]
-    )
+    # Use Render's environment variable when available;
+    # otherwise use the local token.json file.
+    if token_json:
+        try:
+            creds = Credentials.from_authorized_user_info(
+                json.loads(token_json),
+                scopes
+            )
+        except Exception as exc:
+            raise RuntimeError(
+                "GMAIL_TOKEN_JSON is invalid. Check its Render environment value."
+            ) from exc
+    elif os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(
+            token_path,
+            scopes
+        )
+    else:
+        raise RuntimeError(
+            "Gmail credentials are missing. Configure GMAIL_TOKEN_JSON on Render."
+        )
 
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
-        with open(token_path, "w", encoding="utf-8") as f:
-            f.write(creds.to_json())
+
+        # Persist refreshed credentials locally only.
+        if not token_json:
+            with open(token_path, "w", encoding="utf-8") as token_file:
+                token_file.write(creds.to_json())
 
     if not creds.valid:
-        raise RuntimeError("Gmail authorization expired. Reauthorize Gmail.")
+        raise RuntimeError(
+            "Gmail authorization is invalid or expired. Reauthorize Gmail."
+        )
 
     sender = "avaninchal@gmail.com"
 
@@ -149,22 +162,40 @@ else:
     message["subject"] = subject
     message["from"] = formataddr(("NU10 Talent Acquisition", sender))
 
-    raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+    raw = base64.urlsafe_b64encode(
+        message.as_bytes()
+    ).decode("utf-8")
 
     try:
-        service = build("gmail", "v1", credentials=creds)
+        service = build(
+            "gmail",
+            "v1",
+            credentials=creds,
+            cache_discovery=False
+        )
+
         result = service.users().messages().send(
             userId="me",
             body={"raw": raw}
         ).execute()
 
-        print(f"Gmail API sent email to {to}; message ID: {result['id']}")
-        return {"ok": True, "to": to, "provider": "gmail_api"}
+        print(
+            f"Gmail API sent email to {to}; "
+            f"message ID: {result['id']}"
+        )
+
+        return {
+            "ok": True,
+            "to": to,
+            "provider": "gmail_api"
+        }
 
     except Exception as exc:
-        print(f"GMAIL API FAILED for {to}: {type(exc).__name__}: {exc}")
+        print(
+            f"GMAIL API FAILED for {to}: "
+            f"{type(exc).__name__}: {exc}"
+        )
         raise RuntimeError(f"Gmail API failed: {exc}") from exc
-
 
 def email_shell(content):
     logo_path = os.path.join("static", "nu10logo.jpg")
