@@ -426,17 +426,74 @@ def send_email(to, subject, html):
 
 
 
+
 def email_shell(content):
-    logo = logo_html()
-    contact = contact_footer()
+    logo_url = f"{base_url()}/static/nu10logo.jpg"
+
+    signature = f"""
+    <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e5e7eb;">
+      <p style="margin-bottom:18px;">Best regards,</p>
+      <table role="presentation" cellpadding="0" cellspacing="0"
+             style="font-family:Arial,sans-serif;color:#111827;">
+        <tr>
+          <td style="padding:8px 24px 8px 0;vertical-align:middle;
+                     border-right:2px solid #c8b9d8;">
+            <img src="{logo_url}" alt="NU10"
+                 style="width:180px;max-width:180px;height:auto;display:block;">
+          </td>
+          <td style="padding:8px 0 8px 22px;vertical-align:middle;
+                     line-height:1.8;">
+            <div style="font-size:20px;font-weight:bold;color:#168de2;">
+              Avani Anand Inchal
+            </div>
+            <div style="font-weight:bold;">AI Engineer</div>
+            <div>NU10</div>
+            <div style="margin-top:14px;">
+              <a href="mailto:avaniai@nu10.co" style="color:#168de2;">
+                avaniai@nu10.co
+              </a>
+              &nbsp;|&nbsp;
+              <a href="tel:+919353775201" style="color:#168de2;">
+                9353775201
+              </a>
+            </div>
+            <div>
+              <a href="https://maps.google.com/?q=Premier+Square+Indiranagar+Bengaluru"
+                 style="color:#168de2;">
+                #484, Premier Square, 3rd Floor,<br>
+                Chinmaya Mission Hospital Road,<br>
+                Indiranagar, Bengaluru, KA - 560038, India
+              </a>
+            </div>
+            <div style="margin-top:16px;">USA ★ Estonia ★ India</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    """
+
     return f"""<!doctype html>
-<html><body style="margin:0;background:#f3f6fb;font-family:Arial,sans-serif;color:#172033">
-<div style="max-width:640px;margin:24px auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e5eaf2">
-<div style="padding:24px 28px;border-bottom:1px solid #edf0f5">{logo}</div>
-<div style="padding:28px;line-height:1.6">{content}</div>
-<div style="padding:18px 28px;background:#f8fafc;color:#667085;font-size:12px;line-height:1.6">
-{contact}<p style="margin-bottom:0">This message was sent by NU10 Talent Acquisition. If you believe you received it in error, please contact us using the details above.</p>
-</div></div></body></html>"""
+<html>
+<body style="margin:0;background:#f3f6fb;
+             font-family:Arial,sans-serif;color:#172033;">
+  <div style="max-width:680px;margin:24px auto;background:#fff;
+              border-radius:14px;overflow:hidden;border:1px solid #e5eaf2;">
+    <div style="padding:24px 28px;border-bottom:1px solid #edf0f5;">
+      <img src="{logo_url}" alt="NU10"
+           style="width:150px;max-width:100%;height:auto;display:block;">
+    </div>
+    <div style="padding:28px;line-height:1.6;">
+      {content}
+      {signature}
+    </div>
+    <div style="padding:18px 28px;background:#f8fafc;
+                color:#667085;font-size:12px;">
+      This message was sent by NU10 Talent Acquisition.
+      If you believe you received it in error, please contact the sender.
+    </div>
+  </div>
+</body>
+</html>"""
 
 
 def invitation_html(iv):
