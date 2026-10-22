@@ -534,10 +534,6 @@ def invitation_html(iv):
    <p>If none of these times works for you, please contact the Talent Acquisition team.</p>
 <p>Regards,<br><b>NU10 Talent Acquisition</b></p>
 <hr>
-<p><b>NU10.ai | Talent Acquisition Team</b><br>
-Email: talent-acquisition@nu10.ai<br>
-Phone: +91 00000 00000<br>
-Website: <a href="https://nu10.ai">www.nu10.ai</a></p>
 """
 
     return email_shell(content)
