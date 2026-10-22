@@ -458,27 +458,54 @@ signature = """
   </table>
 </div>
 """
+
 def email_shell(content):
     return f"""
     <!DOCTYPE html>
     <html>
     <body style="font-family:Arial,sans-serif;color:#111827;line-height:1.6;">
         {content}
-        <div style="margin-top:20px;">
-  <img src="https://nu10-ta-scheduler.onrender.com/static/nu10logo.jpg"
-       alt="NU10 Technologies"
-       width="150"
-       style="display:block;width:150px;height:auto;border:0;">
-</div>
+
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;">
-            <p>Best regards,</p>
-            <div style="font-size:22px;font-weight:bold;color:#168de2;">
-                NU10 Technologies
-            </div>
-            <div><b>Talent Acquisition</b></div>
-            <div>#484, Premier Square, 3rd Floor,</div>
-            <div>Chinmaya Mission Hospital Road, Indiranagar, Bengaluru, India</div>
-            <div><a href="https://nu10.co">nu10.co</a></div>
+            <p style="margin:0 0 18px 0;">Best regards,</p>
+
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                   style="font-family:Arial,sans-serif;color:#111827;">
+                <tr>
+                    <td width="200" valign="middle"
+                        style="padding:8px 24px 8px 0;border-right:2px solid #c8b9d8;">
+                        <img src="https://nu10-ta-scheduler.onrender.com/static/nu10logo.jpg"
+                             alt="NU10 Technologies"
+                             width="180"
+                             style="display:block;width:180px;max-width:180px;height:auto;border:0;">
+                    </td>
+
+                    <td valign="middle"
+                        style="padding:8px 0 8px 22px;line-height:1.8;">
+                        <div style="font-size:20px;font-weight:bold;color:#168de2;">
+                            NU10 Technologies
+                        </div>
+                        <div style="font-weight:bold;">Talent Acquisition</div>
+                        <div>
+                            <a href="mailto:talent-acquisition@nu10.ai"
+                               style="color:#168de2;text-decoration:underline;">
+                                talent-acquisition@nu10.ai
+                            </a>
+                            &nbsp;|&nbsp; +91 00000 00000
+                        </div>
+                        <div>
+                            #484, Premier Square, 3rd Floor,<br>
+                            Chinmaya Mission Hospital Road,<br>
+                            Indiranagar, Bengaluru, KA - 560038, India
+                        </div>
+                        <div style="margin-top:12px;">USA ★ Estonia ★ India</div>
+                        <div>
+                            <a href="https://nu10.ai"
+                               style="color:#168de2;">www.nu10.ai</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>
