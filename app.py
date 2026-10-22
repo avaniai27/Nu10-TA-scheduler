@@ -523,7 +523,7 @@ def invitation_html(iv):
 
         buttons += f'<p style="margin:12px 0"><a href="{url}" style="display:block;text-decoration:none;background:#168de2;color:#fff;padding:13px 16px;border-radius:8px;text-align:center;font-weight:bold">{fmt_slot(slot["datetime"])}</a></p>'
 
-    content = f"""<h2 style="margin-top:0">Interview invitation</h2>
+    content = f"""<h2 style="margin-top:0">Interview Invitation</h2>
 
     <p>Hello {iv.candidate_name},</p><p>Thank you for your interest in the <b>{iv.job_title}</b> opportunity. We would like to invite you to an interview.</p>
 
@@ -544,7 +544,7 @@ def confirmation_html(iv, recipient_name, is_candidate):
 
     slot = fmt_slot(iv.selected_slot)
 
-    content = f"""<h2 style="margin-top:0">Interview confirmed</h2><p>Hello {recipient_name},</p>
+    content = f"""<h2 style="margin-top:0">Interview Confirmed</h2><p>Hello {recipient_name},</p>
 
     <p>The interview for <b>{iv.candidate_name}</b> for <b>{iv.job_title}</b> has been scheduled.</p>
 
