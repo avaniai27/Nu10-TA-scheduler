@@ -464,6 +464,12 @@ def email_shell(content):
     <html>
     <body style="font-family:Arial,sans-serif;color:#111827;line-height:1.6;">
         {content}
+        <div style="margin-top:20px;">
+  <img src="https://nu10-ta-scheduler.onrender.com/static/nu10logo.jpg"
+       alt="NU10 Technologies"
+       width="150"
+       style="display:block;width:150px;height:auto;border:0;">
+</div>
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;">
             <p>Best regards,</p>
             <div style="font-size:22px;font-weight:bold;color:#168de2;">
