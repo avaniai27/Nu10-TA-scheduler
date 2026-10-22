@@ -942,31 +942,48 @@ def create_calendar_event(iv):
 ).execute()
 
     # Meet generation can be asynchronous; poll briefly for the conference link.
-    event_id = created.get("id")
-    meet_url = created.get("hangoutLink")
-    for _ in range(5):
-        if meet_url:
-            break
-        time.sleep(1)
-        current = service.events().get(calendarId="primary", eventId=event_id).execute()
-        meet_url = current.get("hangoutLink")
-        created = current
+    if not created:
+    raise RuntimeError(
+        "Google Calendar event was not created. Check the calendar event creation step."
+    )
 
-    if not meet_url:
-        raise RuntimeError(
-            "Google Calendar created the event but did not return a Google Meet link yet. "
-            "Check that Google Calendar is enabled and the authorized account can create Meet conferences."
-        )
+event_id = created.get("id")
+meet_url = created.get("hangoutLink")
 
-    iv.meeting_url = meet_url
-    db = SessionLocal()
-    try:
-        saved = db.query(Interview).filter_by(id=iv.id).first()
-        if saved:
-            saved.meeting_url = meet_url
-            db.commit()
-    finally:
-        db.close()
+if not event_id:
+    raise RuntimeError(
+        "Google Calendar did not return an event ID."
+    )
+
+for _ in range(5):
+    if meet_url:
+        break
+
+    time.sleep(1)
+    current = service.events().get(
+        calendarId="primary",
+        eventId=event_id
+    ).execute()
+
+    meet_url = current.get("hangoutLink")
+    created = current
+
+if not meet_url:
+    raise RuntimeError(
+        "Google Calendar created the event but did not return a Google Meet link yet. "
+        "Check that Google Calendar is enabled and the authorized account can create Meet conferences."
+    )
+
+iv.meeting_url = meet_url
+
+db = SessionLocal()
+try:
+    saved = db.query(Interview).filter_by(id=iv.id).first()
+    if saved:
+        saved.meeting_url = meet_url
+        db.commit()
+finally:
+    db.close()
 
     print(f"GOOGLE CALENDAR EVENT CREATED for interview {iv.id}: {event_id}; Meet: {meet_url}")
     return created
