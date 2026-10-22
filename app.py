@@ -104,49 +104,57 @@ def fmt_slot(value):
 
 
 
+
 def send_email(to, subject, html):
-    """Send interview emails through Gmail SMTP using STARTTLS."""
+    """Send HTML email using the authorized Gmail API."""
     import os
-    import smtplib
-    import ssl
-    from email.message import EmailMessage
+    import base64
+    from email.mime.text import MIMEText
     from email.utils import formataddr
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+    from googleapiclient.discovery import build
 
-    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    smtp_user = os.getenv("SMTP_USER", "").strip()
-    smtp_pass = os.getenv("SMTP_PASS", "").strip().replace(" ", "")
-    sender = os.getenv("EMAIL_FROM", smtp_user).strip()
+    token_path = os.path.join(os.path.dirname(__file__), "token.json")
 
-    if not smtp_user or not smtp_pass:
-        raise RuntimeError(
-            "Gmail SMTP is not configured. Set SMTP_USER and SMTP_PASS in .env"
-        )
+    if not os.path.exists(token_path):
+        raise RuntimeError("Gmail token.json is missing.")
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = formataddr(("NU10 Talent Acquisition", sender))
-    msg["To"] = to
-    msg.set_content("Please open this email in an HTML-compatible email client.")
-    msg.add_alternative(html, subtype="html")
+    creds = Credentials.from_authorized_user_file(
+        token_path,
+        ["https://www.googleapis.com/auth/gmail.send"]
+    )
+
+    if creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        with open(token_path, "w", encoding="utf-8") as f:
+            f.write(creds.to_json())
+
+    if not creds.valid:
+        raise RuntimeError("Gmail authorization expired. Reauthorize Gmail.")
+
+    sender = "avaninchal@gmail.com"
+
+    message = MIMEText(html, "html", "utf-8")
+    message["to"] = to
+    message["subject"] = subject
+    message["from"] = formataddr(("NU10 Talent Acquisition", sender))
+
+    raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
 
     try:
-        context = ssl.create_default_context()
-        with smtplib.SMTP(smtp_host, smtp_port, timeout=30) as server:
-            server.ehlo()
-            server.starttls(context=context)
-            server.ehlo()
-            server.login(smtp_user, smtp_pass)
-            server.send_message(msg)
+        service = build("gmail", "v1", credentials=creds)
+        result = service.users().messages().send(
+            userId="me",
+            body={"raw": raw}
+        ).execute()
 
-        print(f"Gmail SMTP sent email to {to}")
-        return {"ok": True, "to": to, "provider": "gmail_smtp"}
+        print(f"Gmail API sent email to {to}; message ID: {result['id']}")
+        return {"ok": True, "to": to, "provider": "gmail_api"}
 
     except Exception as exc:
-        print(f"GMAIL SMTP FAILED for {to}: {type(exc).__name__}: {exc}")
-        raise RuntimeError(
-            f"Gmail SMTP failed ({type(exc).__name__}): {exc}"
-        ) from exc
+        print(f"GMAIL API FAILED for {to}: {type(exc).__name__}: {exc}")
+        raise RuntimeError(f"Gmail API failed: {exc}") from exc
 
 
 def email_shell(content):

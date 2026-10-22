@@ -8,3 +8,8 @@ __pycache__/
 *.db
 *.sqlite
 *.sqlite3
+gmail_credentials.json
+
+token.json
+
+authorize_gmail.py
