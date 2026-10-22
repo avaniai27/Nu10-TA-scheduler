@@ -532,7 +532,7 @@ document.getElementById("extractResume")?.addEventListener("click", async () => 
       <div><span>Needs attention</span><b id="rdAttention">0</b></div>
     </div>
 
-    <h3>Readiness checklist</h3>
+    <h3>Workflow Health Check</h3>
     <ul id="rdChecklist">
       <li>⏳ Waiting for interview data…</li>
     </ul>
