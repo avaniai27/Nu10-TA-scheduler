@@ -458,7 +458,25 @@ signature = """
   </table>
 </div>
 """
-
+def email_shell(content):
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family:Arial,sans-serif;color:#111827;line-height:1.6;">
+        {content}
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;">
+            <p>Best regards,</p>
+            <div style="font-size:22px;font-weight:bold;color:#168de2;">
+                NU10 Technologies
+            </div>
+            <div><b>Talent Acquisition</b></div>
+            <div>#484, Premier Square, 3rd Floor,</div>
+            <div>Chinmaya Mission Hospital Road, Indiranagar, Bengaluru, India</div>
+            <div><a href="https://nu10.co">nu10.co</a></div>
+        </div>
+    </body>
+    </html>
+    """
 
 def invitation_html(iv):
 
