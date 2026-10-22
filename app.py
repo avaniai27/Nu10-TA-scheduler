@@ -459,7 +459,14 @@ def invitation_html(iv):
 
     <p>Please select one of the available interview times below. Selecting a time confirms your interview booking.</p>{buttons}
 
-    <p>If none of these times works for you, please contact the Talent Acquisition team.</p><p>Regards,<br><b>NU10 Talent Acquisition</b></p>"""
+   <p>If none of these times works for you, please contact the Talent Acquisition team.</p>
+<p>Regards,<br><b>NU10 Talent Acquisition</b></p>
+<hr>
+<p><b>NU10.ai | Talent Acquisition Team</b><br>
+Email: talent-acquisition@nu10.ai<br>
+Phone: +91 00000 00000<br>
+Website: <a href="https://nu10.ai">www.nu10.ai</a></p>
+"""
 
     return email_shell(content)
 
@@ -477,7 +484,14 @@ def confirmation_html(iv, recipient_name, is_candidate):
 
     {f'<p><a href="{iv.meeting_url}" style="display:inline-block;background:#168de2;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Join Google Meet</a></p>' if iv.meeting_url and 'meet.google.com' in iv.meeting_url else '<p>Your Google Meet link is being prepared. If it is not included in the calendar invitation, please contact NU10 Talent Acquisition using the details below.</p>'}
 
-    <p>Please keep this email for your records.</p><p>Regards,<br><b>NU10 Talent Acquisition</b></p>"""
+    <p>Please keep this email for your records.</p>
+<p>Regards,<br><b>NU10 Talent Acquisition</b></p>
+<hr>
+<p><b>NU10.ai | Talent Acquisition Team</b><br>
+Email: talent-acquisition@nu10.ai<br>
+Phone: +91 00000 00000<br>
+Website: <a href="https://nu10.ai">www.nu10.ai</a></p>
+"""
 
     return email_shell(content)
 
