@@ -430,9 +430,8 @@ def send_email(to, subject, html):
 
 
 logo_url = "/static/nu10logo.png"
-interviewer_email = getattr(iv, "interviewer_email", "")
 
-signature = f"""
+signature = """
 <div style="margin-top:28px;padding-top:20px;border-top:1px solid #e5e7eb;">
   <p>Best regards,</p>
   <table role="presentation" cellpadding="0" cellspacing="0"
