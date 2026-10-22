@@ -2,6 +2,7 @@
 import os, json, secrets, requests
 import requests
 import re
+import json
 from io import BytesIO
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
@@ -120,6 +121,14 @@ def send_email(to, subject, html):
     if not os.path.exists(token_path):
         raise RuntimeError("Gmail token.json is missing.")
 
+    token_json = os.getenv("GMAIL_TOKEN_JSON", "").strip()
+
+if token_json:
+    creds = Credentials.from_authorized_user_info(
+        json.loads(token_json),
+        ["https://www.googleapis.com/auth/gmail.send"]
+    )
+else:
     creds = Credentials.from_authorized_user_file(
         token_path,
         ["https://www.googleapis.com/auth/gmail.send"]
