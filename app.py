@@ -518,47 +518,29 @@ def invitation_html(iv):
 
     for i, slot in enumerate(slots):
         url = f"{base_url()}/book/{iv.public_id}/{i}"
-        buttons += f"""
-        <p style="margin:6px 0;text-align:left;">
-            <a href="{url}"
-               style="display:inline-block;
-                      text-decoration:none;
-                      background:#168de2;
-                      color:#ffffff;
-                      padding:7px 11px;
-                      border-radius:6px;
-                      text-align:center;
-                      font-family:Arial,sans-serif;
-                      font-size:13px;
-                      line-height:1.4;
-                      font-weight:bold;
-                      border:1px solid #168de2;">
-                {fmt_slot(slot["datetime"])}
-            </a>
-        </p>
-        """
+        
+        buttons += (
+            f'<p style="margin:5px 0;text-align:center">'
+            f'<a href="{url}" '
+            f'style="display:inline-block;text-decoration:none;'
+            f'background:#eef5ff;color:#2563a8;'
+            f'padding:7px 12px;border:1px solid #d5e3f5;'
+            f'border-radius:6px;font-weight:400;'
+            f'font-size:13px;line-height:1.4">'
+            f'{fmt_slot(slot["datetime"])}</a></p>'
+        )
 
-    content = f"""
-    <h2 style="margin-top:0">Interview Invitation</h2>
 
+    content = f"""<h2 style="margin-top:0">Interview Invitation</h2>
     <p>Hello {iv.candidate_name},</p>
-
-    <p>Thank you for your interest in the
-    <b>{iv.job_title}</b> opportunity. We would like to invite you to an interview.</p>
-
+    <p>Thank you for your interest in the <b>{iv.job_title}</b> opportunity. We would like to invite you to an interview.</p>
     <p>NU10 helps organizations build AI-powered solutions that make work more intelligent and efficient. Our team focuses on practical innovation and helping businesses solve meaningful problems with technology.</p>
-
-    <p>Please select one of the available interview times below.
-    Selecting a time confirms your interview booking.</p>
-
+    <p>Please select one of the available interview times below. Selecting a time confirms your interview booking.</p>
     {buttons}
-
     <p>If none of these times works for you, please contact the Talent Acquisition team.</p>
-
     <p>Regards,<br><b>NU10 Talent Acquisition</b></p>
     <hr>
     """
-
     return email_shell(content)
 
 def confirmation_html(iv, recipient_name, is_candidate):
