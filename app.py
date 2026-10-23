@@ -1,5 +1,3 @@
-
-
 import os, json, secrets, requests, uuid, time
 
 import requests
@@ -442,7 +440,7 @@ signature = """
         <div style="font-size:24px;font-weight:bold;color:#168de2;">NU10</div>
       </td>
       <td style="padding:8px 0 8px 20px;vertical-align:middle;line-height:1.8;">
-        <div style="font-size:20px;font-weight:bold;color:#168de2;">NU10 Technologies</div>
+        <div style="font-size:20px;font-weight:bold;color:#168de2;">Nu10 Technologies</div>
         <div style="font-weight:bold;">Talent Acquisition</div>
         <div>
           <a href="mailto:{interviewer_email}" style="color:#168de2;">
@@ -483,7 +481,7 @@ def email_shell(content):
                     <td valign="middle"
                         style="padding:8px 0 8px 22px;line-height:1.8;">
                         <div style="font-size:20px;font-weight:bold;color:#168de2;">
-                            NU10 Technologies
+                            Nu10 Technologies
                         </div>
                         <div style="font-weight:bold;">Talent Acquisition</div>
                         <div>
@@ -518,7 +516,7 @@ def invitation_html(iv):
 
     for i, slot in enumerate(slots):
         url = f"{base_url()}/book/{iv.public_id}/{i}"
-        
+
         buttons += (
             f'<p style="margin:5px 0;text-align:center">'
             f'<a href="{url}" '
@@ -1403,4 +1401,5 @@ from fastapi.responses import FileResponse
 
 @app.get("/")
 def home():
+
     return FileResponse(STATIC_DIR / "index.html")
